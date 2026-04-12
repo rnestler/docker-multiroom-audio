@@ -31,8 +31,11 @@ the audio in sync.
 ## Quick Start
 
 ```bash
+# Create data directories
+mkdir -p mpd/music mpd/playlists mpd/data snapserver librespot-cache
+
 # Edit docker-compose.yml to set your UID:GID (see 'id -u' and 'id -g')
-docker compose up --build
+docker compose up
 ```
 
 The container must run with `network_mode: host` so that librespot's mDNS
