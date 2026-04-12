@@ -1,0 +1,65 @@
+---
+- name: Deploy multiroom-audio
+  hosts: all
+  become: true
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Create multiroom-audio user
+      ansible.builtin.user:
+        name: multiroom-audio
+        uid: "{{ multiroom_audio_uid }}"
+        home: "{{ multiroom_audio_base_dir }}"
+        create_home: false
+        shell: /usr/sbin/nologin
+        system: true
+        state: present
+
+    - name: Create data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: multiroom-audio
+        group: multiroom-audio
+        mode: "0755"
+      loop:
+        - "{{ multiroom_audio_base_dir }}"
+        - "{{ multiroom_audio_base_dir }}/mpd"
+        - "{{ multiroom_audio_base_dir }}/mpd/music"
+        - "{{ multiroom_audio_base_dir }}/mpd/playlists"
+        - "{{ multiroom_audio_base_dir }}/mpd/data"
+        - "{{ multiroom_audio_base_dir }}/snapserver"
+        - "{{ multiroom_audio_base_dir }}/librespot-cache"
+
+    - name: Create ipvlan network
+      community.docker.docker_network:
+        name: multiroom-audio
+        driver: ipvlan
+        driver_options:
+          parent: "{{ multiroom_audio_parent }}"
+        ipam_config:
+          - subnet: "{{ multiroom_audio_subnet }}"
+            gateway: "{{ multiroom_audio_gateway }}"
+            iprange: "{{ multiroom_audio_ip_range }}"
+
+    - name: Pull Docker image
+      community.docker.docker_image:
+        name: ghcr.io/rnestler/docker-multiroom-audio:main
+        source: pull
+        force_source: true
+
+    - name: Run multiroom-audio container
+      community.docker.docker_container:
+        name: multiroom-audio
+        image: ghcr.io/rnestler/docker-multiroom-audio:main
+        state: started
+        restart_policy: unless-stopped
+        networks:
+          - name: multiroom-audio
+            ipv4_address: "{{ multiroom_audio_ip }}"
+        user: "{{ multiroom_audio_uid }}:{{ multiroom_audio_uid }}"
+        volumes:
+          - "{{ multiroom_audio_base_dir }}/mpd:/var/lib/mpd"
+          - "{{ multiroom_audio_base_dir }}/snapserver:/var/lib/snapserver"
+          - "{{ multiroom_audio_base_dir }}/librespot-cache:/var/lib/librespot-cache"
