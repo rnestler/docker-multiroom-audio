@@ -1,0 +1,8 @@
+services:
+  multiroom-audio:
+    build: .
+    network_mode: host
+    volumes:
+      - ./mpd:/var/lib/mpd
+      - ./snapserver:/var/lib/snapserver
+      - ./librespot-cache:/var/lib/librespot-cache

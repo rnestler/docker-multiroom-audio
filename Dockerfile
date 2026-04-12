@@ -15,8 +15,12 @@ COPY mpd.conf /etc/mpd.conf
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Create MPD directories
-RUN mkdir -p /var/lib/mpd/music /var/lib/mpd/playlists /var/lib/mpd/data
+# Create MPD and librespot directories
+RUN mkdir -p /var/lib/mpd/music /var/lib/mpd/playlists /var/lib/mpd/data /var/lib/librespot-cache
+
+VOLUME /var/lib/mpd
+VOLUME /var/lib/snapserver
+VOLUME /var/lib/librespot-cache
 
 # Snapcast stream protocol (snapclients connect here)
 EXPOSE 1704
