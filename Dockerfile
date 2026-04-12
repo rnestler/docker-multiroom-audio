@@ -15,8 +15,11 @@ COPY mpd.conf /etc/mpd.conf
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Create MPD and librespot directories
-RUN mkdir -p /var/lib/mpd/music /var/lib/mpd/playlists /var/lib/mpd/data /var/lib/librespot-cache
+# Create data directories writable by any UID (for --user support)
+RUN mkdir -p /var/lib/mpd/music /var/lib/mpd/playlists /var/lib/mpd/data \
+    /var/lib/librespot-cache /var/lib/snapserver && \
+    chmod 777 /var/lib/mpd /var/lib/mpd/music /var/lib/mpd/playlists /var/lib/mpd/data \
+    /var/lib/librespot-cache /var/lib/snapserver
 
 VOLUME /var/lib/mpd
 VOLUME /var/lib/snapserver

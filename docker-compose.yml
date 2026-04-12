@@ -2,6 +2,9 @@ services:
   multiroom-audio:
     build: .
     network_mode: host
+    # Run as your host user for proper file ownership on bind mounts.
+    # Replace with your UID:GID (run 'id -u' and 'id -g' to find out).
+    user: "1000:1000"
     volumes:
       - ./mpd:/var/lib/mpd
       - ./snapserver:/var/lib/snapserver
