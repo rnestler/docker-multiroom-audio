@@ -1,6 +1,7 @@
 services:
   multiroom-audio:
     build: .
+    image: ghcr.io/rnestler/docker-multiroom-audio:main
     network_mode: host
     # Run as your host user for proper file ownership on bind mounts.
     # Replace with your UID:GID (run 'id -u' and 'id -g' to find out).
