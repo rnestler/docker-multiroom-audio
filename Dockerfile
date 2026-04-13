@@ -1,10 +1,11 @@
 FROM alpine:3
 
-# Add testing repository for librespot
+# Add testing repository for librespot and snapweb
 RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories
 
 RUN apk add --no-cache \
     snapcast-server \
+    snapweb \
     librespot \
     mpd \
     supervisor
@@ -29,7 +30,7 @@ VOLUME /var/lib/librespot-cache
 EXPOSE 1704
 # Snapcast control protocol
 EXPOSE 1705
-# Snapcast HTTP JSON-RPC API
+# Snapcast HTTP JSON-RPC API / Snapweb
 EXPOSE 1780
 # MPD control
 EXPOSE 6600
