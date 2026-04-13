@@ -2,11 +2,28 @@ services:
   multiroom-audio:
     build: .
     image: ghcr.io/rnestler/docker-multiroom-audio:main
-    network_mode: host
+    hostname: multiroom-audio
     # Run as your host user for proper file ownership on bind mounts.
     # Replace with your UID:GID (run 'id -u' and 'id -g' to find out).
     user: "1000:1000"
+    networks:
+      multiroom:
+        # Static IP for the container (must not overlap with your DHCP range)
+        ipv4_address: 192.168.0.210
     volumes:
       - ./mpd:/var/lib/mpd
       - ./snapserver:/var/lib/snapserver
       - ./librespot-cache:/var/lib/librespot-cache
+
+networks:
+  multiroom:
+    driver: ipvlan
+    driver_opts:
+      # Host network interface to attach to
+      parent: wlan0
+    ipam:
+      config:
+        # Adjust subnet and gateway to match your LAN
+        - subnet: 192.168.0.0/24
+          gateway: 192.168.0.254
+          ip_range: 192.168.0.208/28

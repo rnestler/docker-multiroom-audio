@@ -38,8 +38,10 @@ mkdir -p mpd/music mpd/playlists mpd/data snapserver librespot-cache
 docker compose up
 ```
 
-The container must run with `network_mode: host` so that librespot's mDNS
-(Zeroconf) can advertise the Spotify Connect device on your local network.
+The container uses an **ipvlan** network so it gets its own LAN IP address.
+This allows librespot's mDNS (Zeroconf) to advertise the Spotify Connect
+device on your local network. Edit `docker-compose.yml` to match your LAN
+subnet, gateway, and interface.
 
 ## Configuration
 
@@ -109,17 +111,36 @@ Put your music files in `./mpd/music/`.
 
 ## Networking
 
-Spotify Connect discovery uses mDNS (multicast DNS) on UDP port 5353.
-This requires `network_mode: host` in Docker so that multicast traffic
-reaches the LAN. Standard Docker bridge networking does not support this.
+The container uses an [ipvlan](https://docs.docker.com/network/drivers/ipvlan/)
+network (L2 mode) so it gets its own IP address on the LAN. This allows
+librespot's mDNS (Zeroconf) to broadcast Spotify Connect discovery without
+`network_mode: host`.
+
+**Why ipvlan instead of macvlan?** ipvlan shares the host's MAC address,
+which works with WiFi access points. macvlan creates additional MAC addresses
+that most WiFi APs reject. DHCP doesn't work well with ipvlan (same MAC = same
+lease), so the container uses a static IP.
 
 Snapserver's own mDNS is disabled (`mdns_enabled = false` in `snapserver.conf`)
 to avoid a port 5353 conflict with librespot's built-in mDNS responder.
 
-If you need to run multiple instances, consider using a
-[macvlan](https://docs.docker.com/network/drivers/macvlan/) network instead of
-host networking -- each container gets its own LAN IP and can independently
-broadcast mDNS.
+Configure the network in `docker-compose.yml`:
+
+```yaml
+networks:
+  multiroom:
+    driver: ipvlan
+    driver_opts:
+      parent: wlan0          # Your host's network interface
+    ipam:
+      config:
+        - subnet: 192.168.0.0/24
+          gateway: 192.168.0.254
+          ip_range: 192.168.0.208/28  # Range for container IPs
+```
+
+The container's static IP must fall within `ip_range` and must **not** overlap
+with your DHCP range. Update `host` in `snapserver.conf` to match this IP.
 
 ## License
 
