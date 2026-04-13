@@ -11,7 +11,6 @@ RUN apk add --no-cache \
     supervisor
 
 COPY supervisord.conf /etc/supervisord.conf
-COPY snapserver.conf /etc/snapserver.conf
 COPY mpd.conf /etc/mpd.conf
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

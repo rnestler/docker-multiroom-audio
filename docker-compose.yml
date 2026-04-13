@@ -11,6 +11,7 @@ services:
         # Static IP for the container (must not overlap with your DHCP range)
         ipv4_address: 192.168.0.210
     volumes:
+      - ./snapserver.conf:/etc/snapserver.conf:ro
       - ./mpd:/var/lib/mpd
       - ./snapserver:/var/lib/snapserver
       - ./librespot-cache:/var/lib/librespot-cache

@@ -34,7 +34,9 @@ the audio in sync.
 # Create data directories
 mkdir -p mpd/music mpd/playlists mpd/data snapserver librespot-cache
 
-# Edit docker-compose.yml to set your UID:GID (see 'id -u' and 'id -g')
+# Edit snapserver.conf: set 'host' to your container's IP address
+# Edit docker-compose.yml: set your UID:GID (see 'id -u' and 'id -g')
+#   and adjust the network settings to match your LAN
 docker compose up
 ```
 
@@ -65,6 +67,17 @@ To change the device name, edit `snapserver.conf`:
 ```ini
 source = librespot:///usr/bin/librespot?name=Spotify&devicename=MySpeaker&bitrate=320&volume=100&cache=/var/lib/librespot-cache
 ```
+
+### snapserver.conf
+
+The snapserver configuration is bind-mounted from `./snapserver.conf` into the
+container. Key settings to adjust:
+
+- **`host`** in `[http]`: Set this to the container's IP address so that
+  Snapweb and clients can connect. This must match the `ipv4_address` in
+  `docker-compose.yml`.
+- **`devicename`** in the `librespot://` source: The Spotify Connect device
+  name visible in the Spotify app.
 
 ### MPD
 
@@ -101,10 +114,11 @@ snapclient -h <server-ip>
 
 All data is stored in bind mounts relative to the project directory:
 
-| Host Path          | Container Path           | Purpose                              |
-|--------------------|--------------------------|--------------------------------------|
-| `./mpd/`           | `/var/lib/mpd`           | Music, playlists, database, state    |
-| `./snapserver/`    | `/var/lib/snapserver`    | Snapserver persistent data           |
+| Host Path            | Container Path             | Purpose                             |
+|----------------------|----------------------------|-------------------------------------|
+| `./snapserver.conf`  | `/etc/snapserver.conf`     | Snapserver configuration            |
+| `./mpd/`             | `/var/lib/mpd`             | Music, playlists, database, state   |
+| `./snapserver/`      | `/var/lib/snapserver`      | Snapserver persistent data          |
 | `./librespot-cache/` | `/var/lib/librespot-cache` | Spotify credentials and audio cache |
 
 Put your music files in `./mpd/music/`.
