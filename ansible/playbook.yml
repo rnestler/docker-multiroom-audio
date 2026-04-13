@@ -37,7 +37,7 @@
         name: multiroom-audio
         driver: ipvlan
         driver_options:
-          parent: "{{ multiroom_audio_parent }}"
+          parent: "{{ multiroom_audio_network_interface }}"
         ipam_config:
           - subnet: "{{ multiroom_audio_subnet }}"
             gateway: "{{ multiroom_audio_gateway }}"
@@ -53,6 +53,7 @@
       community.docker.docker_container:
         name: multiroom-audio
         image: ghcr.io/rnestler/docker-multiroom-audio:main
+        hostname: multiroom-audio
         state: started
         restart_policy: unless-stopped
         networks:
