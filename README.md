@@ -34,9 +34,11 @@ the audio in sync.
 # Create data directories
 mkdir -p mpd/music mpd/playlists mpd/data snapserver librespot-cache
 
+# Configure environment (network settings, UID/GID)
+cp .env.example .env
+# Edit .env to match your LAN and user setup
+
 # Edit snapserver.conf: set 'host' to your container's IP address
-# Edit docker-compose.yml: set your UID:GID (see 'id -u' and 'id -g')
-#   and adjust the network settings to match your LAN
 docker compose up
 ```
 
