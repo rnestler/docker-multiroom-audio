@@ -8,7 +8,11 @@ RUN apk add --no-cache \
     snapweb \
     librespot \
     mpd \
-    supervisor
+    supervisor \
+    py3-mpd2 \
+    py3-musicbrainzngs \
+    py3-gobject3 \
+    py3-dbus
 
 COPY supervisord.conf /etc/supervisord.conf
 COPY mpd.conf /etc/mpd.conf
