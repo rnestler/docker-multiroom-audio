@@ -32,6 +32,14 @@
         - "{{ multiroom_audio_base_dir }}/snapserver"
         - "{{ multiroom_audio_base_dir }}/librespot-cache"
 
+    - name: Template snapserver.conf
+      ansible.builtin.template:
+        src: templates/snapserver.conf.j2
+        dest: "{{ multiroom_audio_base_dir }}/snapserver.conf"
+        owner: multiroom-audio
+        group: multiroom-audio
+        mode: "0644"
+
     - name: Create ipvlan network
       community.docker.docker_network:
         name: multiroom-audio
@@ -61,6 +69,7 @@
             ipv4_address: "{{ multiroom_audio_ip }}"
         user: "{{ multiroom_audio_uid }}:{{ multiroom_audio_uid }}"
         volumes:
+          - "{{ multiroom_audio_base_dir }}/snapserver.conf:/etc/snapserver.conf:ro"
           - "{{ multiroom_audio_base_dir }}/mpd:/var/lib/mpd"
           - "{{ multiroom_audio_base_dir }}/snapserver:/var/lib/snapserver"
           - "{{ multiroom_audio_base_dir }}/librespot-cache:/var/lib/librespot-cache"

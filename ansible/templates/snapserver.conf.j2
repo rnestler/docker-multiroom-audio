@@ -1,0 +1,19 @@
+[server]
+# Disable mDNS to avoid needing avahi-daemon in the container.
+# This prevents a port 5353 conflict with librespot's built-in mDNS
+# which is needed for Spotify Connect discovery.
+mdns_enabled = false
+
+[http]
+# Hostname or IP that snapserver advertises to clients.
+host = {{ multiroom_audio_ip }}
+doc_root = /usr/share/snapweb
+
+[stream]
+# Snapserver launches and manages librespot as a child process.
+# It automatically sets --backend pipe and reads PCM from stdout.
+# Audio format is 44100:16:2 (Spotify's native format).
+source = librespot:///usr/bin/librespot?name=Spotify&devicename=Snapcast&bitrate=320&volume=100&cache=/var/lib/librespot-cache
+
+# MPD outputs audio to this named pipe.
+source = pipe:///tmp/snapfifo-mpd?name=MPD&sampleformat=44100:16:2
