@@ -12,6 +12,7 @@ services:
       - ./mpd:/var/lib/mpd
       - ./snapserver:/var/lib/snapserver
       - ./librespot-cache:/var/lib/librespot-cache
+      - ./mympd:/var/lib/mympd
 
 networks:
   multiroom:

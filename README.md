@@ -1,8 +1,9 @@
 # Docker Multiroom Audio
 
 A Docker container running [Snapcast](https://github.com/badaix/snapcast),
-[librespot](https://github.com/librespot-org/librespot), and
-[MPD](https://www.musicpd.org/) for multiroom audio streaming.
+[librespot](https://github.com/librespot-org/librespot),
+[MPD](https://www.musicpd.org/), and
+[myMPD](https://github.com/jcorporation/myMPD) for multiroom audio streaming.
 
 ## Architecture
 
@@ -11,13 +12,16 @@ graph LR
     subgraph Docker Container
         supervisord --> snapserver
         supervisord --> mpd
+        supervisord --> mympd
 
         snapserver -- "launches & manages" --> librespot
         mpd -- "/tmp/snapfifo-mpd (FIFO)" --> snapserver
+        mympd -- ":6600" --> mpd
     end
 
     Spotify["Spotify App"] -- "Spotify Connect\n(mDNS discovery)" --> librespot
     MPDClient["MPD Client"] -- ":6600" --> mpd
+    Browser["Browser"] -- ":8080" --> mympd
     snapserver -- ":1704 stream" --> SnapClient["Snapcast Clients"]
     snapserver -. ":1705 control" .-> SnapClient
     snapserver -. ":1780 HTTP API" .-> SnapClient
@@ -25,14 +29,16 @@ graph LR
 
 Snapserver manages librespot as a child process via its built-in `librespot://`
 source type. MPD outputs audio to a named FIFO pipe that snapserver reads as a
-second source. Snapcast clients on the network connect to the server and play
-the audio in sync.
+second source. [myMPD](https://github.com/jcorporation/myMPD) provides a
+web-based UI for controlling MPD (browse library, manage playlists, control
+playback) on port 8080. Snapcast clients on the network connect to the server
+and play the audio in sync.
 
 ## Quick Start
 
 ```bash
 # Create data directories
-mkdir -p mpd/music mpd/playlists mpd/data snapserver librespot-cache
+mkdir -p mpd/music mpd/playlists mpd/data snapserver librespot-cache mympd
 
 # Configure environment (network settings, UID/GID)
 cp .env.example .env
@@ -94,6 +100,17 @@ cp -r /path/to/your/music ./mpd/music/
 mpc update
 ```
 
+### myMPD
+
+[myMPD](https://github.com/jcorporation/myMPD) is a web-based MPD client
+accessible at `http://<container-ip>:8080`. It provides a mobile-friendly
+interface for browsing your music library, managing playlists, and controlling
+playback.
+
+myMPD auto-detects the MPD instance running in the same container on
+`localhost:6600`. SSL is disabled (HTTP only) since the container runs on a
+LAN behind ipvlan. State and configuration are persisted in `./mympd/`.
+
 ### Snapcast Clients
 
 Snapcast clients on other machines connect to port **1704**. Install
@@ -111,6 +128,7 @@ snapclient -h <server-ip>
 | 1705 | Snapcast control     | TCP      |
 | 1780 | Snapcast HTTP API    | TCP      |
 | 6600 | MPD control          | TCP      |
+| 8080 | myMPD web interface  | TCP      |
 
 ## Volumes
 
@@ -122,6 +140,7 @@ All data is stored in bind mounts relative to the project directory:
 | `./mpd/`             | `/var/lib/mpd`             | Music, playlists, database, state   |
 | `./snapserver/`      | `/var/lib/snapserver`      | Snapserver persistent data          |
 | `./librespot-cache/` | `/var/lib/librespot-cache` | Spotify credentials and audio cache |
+| `./mympd/`           | `/var/lib/mympd`           | myMPD state and configuration       |
 
 Put your music files in `./mpd/music/`.
 
