@@ -31,6 +31,7 @@
         - "{{ multiroom_audio_base_dir }}/mpd/data"
         - "{{ multiroom_audio_base_dir }}/snapserver"
         - "{{ multiroom_audio_base_dir }}/librespot-cache"
+        - "{{ multiroom_audio_base_dir }}/mympd"
 
     - name: Template snapserver.conf
       ansible.builtin.template:
@@ -73,3 +74,4 @@
           - "{{ multiroom_audio_base_dir }}/mpd:/var/lib/mpd"
           - "{{ multiroom_audio_base_dir }}/snapserver:/var/lib/snapserver"
           - "{{ multiroom_audio_base_dir }}/librespot-cache:/var/lib/librespot-cache"
+          - "{{ multiroom_audio_base_dir }}/mympd:/var/lib/mympd"

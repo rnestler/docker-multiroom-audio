@@ -1,13 +1,15 @@
 FROM alpine:3
 
-# Add testing repository for librespot and snapweb
-RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories
+# Add edge repositories for librespot, snapweb (testing) and mympd (community)
+RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
+    echo "https://dl-cdn.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories
 
 RUN apk add --no-cache \
     snapcast-server \
     snapweb \
     librespot \
     mpd \
+    mympd \
     supervisor \
     py3-mpd2 \
     py3-musicbrainzngs \
@@ -21,13 +23,16 @@ RUN chmod +x /entrypoint.sh
 
 # Create data directories writable by any UID (for --user support)
 RUN mkdir -p /var/lib/mpd/music /var/lib/mpd/playlists /var/lib/mpd/data \
-    /var/lib/librespot-cache /var/lib/snapserver && \
+    /var/lib/librespot-cache /var/lib/snapserver \
+    /var/lib/mympd /var/cache/mympd && \
     chmod 777 /var/lib/mpd /var/lib/mpd/music /var/lib/mpd/playlists /var/lib/mpd/data \
-    /var/lib/librespot-cache /var/lib/snapserver
+    /var/lib/librespot-cache /var/lib/snapserver \
+    /var/lib/mympd /var/cache/mympd
 
 VOLUME /var/lib/mpd
 VOLUME /var/lib/snapserver
 VOLUME /var/lib/librespot-cache
+VOLUME /var/lib/mympd
 
 # Snapcast stream protocol (snapclients connect here)
 EXPOSE 1704
@@ -37,5 +42,7 @@ EXPOSE 1705
 EXPOSE 1780
 # MPD control
 EXPOSE 6600
+# myMPD web interface
+EXPOSE 8080
 
 ENTRYPOINT ["/entrypoint.sh"]
