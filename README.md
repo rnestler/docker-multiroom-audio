@@ -16,7 +16,7 @@ graph LR
 
         snapserver -- "launches & manages" --> librespot
         mpd -- "/tmp/snapfifo-mpd (FIFO)" --> snapserver
-        mympd -- ":6600" --> mpd
+        mympd -- "/var/lib/mpd/socket" --> mpd
     end
 
     Spotify["Spotify App"] -- "Spotify Connect\n(mDNS discovery)" --> librespot
