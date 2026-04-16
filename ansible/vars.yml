@@ -1,0 +1,18 @@
+# User configuration
+multiroom_audio_uid: 1000
+
+# Paths
+multiroom_audio_base_dir: /srv/multiroom-audio
+
+# ipvlan network settings
+# The container gets its own IP on the LAN via ipvlan (L2 mode).
+# This provides network isolation while allowing mDNS for Spotify Connect.
+# Adjust these to match your LAN configuration.
+multiroom_audio_subnet: 192.168.0.0/24
+multiroom_audio_gateway: 192.168.0.254
+# IP range reserved for containers (must not overlap with your DHCP range)
+multiroom_audio_ip_range: 192.168.0.208/28
+# Host network interface to attach the ipvlan network to
+multiroom_audio_network_interface: eth0
+# Static IP for the container (must be within ip_range)
+multiroom_audio_ip: 192.168.0.210
