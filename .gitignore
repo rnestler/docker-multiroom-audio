@@ -1,4 +1,5 @@
 /mpd/
 /snapserver/
 /librespot-cache/
+/mympd/
 .env
