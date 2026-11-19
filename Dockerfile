@@ -1,17 +1,16 @@
-FROM alpine:3
+FROM alpine:3.24
 
-# Add edge repositories for librespot, snapweb (testing) and mympd (community).
-# Use @tag pinning so only explicitly tagged packages are pulled from edge;
+# Add edge testing repository for librespot and snapweb.
+# Use @testing pinning so only explicitly tagged packages are pulled from edge;
 # everything else resolves from the stable repos to avoid version conflicts.
-RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
-    echo "@community https://dl-cdn.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories
+RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories
 
 RUN apk add --no-cache \
     snapcast-server \
     snapweb@testing \
     librespot@testing \
     mpd \
-    mympd@community \
+    mympd \
     supervisor \
     py3-mpd2 \
     py3-musicbrainzngs \
