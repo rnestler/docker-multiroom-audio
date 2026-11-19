@@ -1,4 +1,4 @@
-FROM alpine:3
+FROM alpine:3.24
 
 # Add edge repositories for librespot, snapweb (testing) and mympd (community).
 # Use @tag pinning so only explicitly tagged packages are pulled from edge;
